@@ -7,5 +7,7 @@
 </head>
 <body>
     <h1>Đây là trang chủ</h1>
+     <a href="/auth/logout">Logout</a>
 </body>
+
 </html>

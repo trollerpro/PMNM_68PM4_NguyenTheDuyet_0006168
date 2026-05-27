@@ -1,11 +1,11 @@
 <?php
 class homeController{
     public function index(){
-        echo"Đây là trang chủ";
+        require_once '../app/View/home/index.php';
         
     }
-    public function about(){
-        echo "Đây là trang giới thiệu";
+    public function login(){
+        require_once '../app/View/home/login.php';
     }
 }
 ?>  

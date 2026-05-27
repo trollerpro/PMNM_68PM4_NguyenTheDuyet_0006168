@@ -2,7 +2,7 @@
 class App
 {
     protected $controller = 'homeController';
-    protected $action = 'index';
+    protected $action = 'login';
     protected $params = [];
 
     public function __construct()
@@ -21,7 +21,7 @@ class App
                 unset($urlProcessed[0]);
             }
         }
-        require_once '../app/Controller/' . $this->controller . '.php';
+        require_once dirname(__DIR__) . '/Controller/' . $this->controller . '.php';
         $this->controller = new $this->controller; //tạo đối tượng controller
         if (isset($urlProcessed[1])) {
             if (method_exists($this->controller, $urlProcessed[1])) {
