@@ -1,0 +1,14 @@
+<?php
+class home{
+    public function index(){
+        // require_once '../app/View/home/index.php';
+        require_once '../app/views/layout/masterlayout.php';
+
+        
+    }
+    public function login(){
+        require_once '../app/views/home/login.php';
+            // require_once '../app/View/layout/masterlayout.php';
+    }
+}
+?>  

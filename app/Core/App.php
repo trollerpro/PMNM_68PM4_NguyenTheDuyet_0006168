@@ -1,8 +1,8 @@
 <?php
 class App
 {
-    protected $controller = 'homeController';
-    protected $action = 'login';
+    protected $controller = 'home';
+    protected $action = 'index';
     protected $params = [];
 
     public function __construct()
@@ -16,12 +16,12 @@ class App
         
         
         if (isset($urlProcessed[0])) {
-            if (file_exists('./app/Controller/' . $urlProcessed[0] . '.php')) {
+            if (file_exists('../app/controllers/' . $urlProcessed[0] . '.php')) {
                 $this->controller = $urlProcessed[0];
                 unset($urlProcessed[0]);
             }
         }
-        require_once dirname(__DIR__) . '/Controller/' . $this->controller . '.php';
+        require_once dirname(__DIR__) . '/controllers/' . $this->controller . '.php';
         $this->controller = new $this->controller; //tạo đối tượng controller
         if (isset($urlProcessed[1])) {
             if (method_exists($this->controller, $urlProcessed[1])) {
