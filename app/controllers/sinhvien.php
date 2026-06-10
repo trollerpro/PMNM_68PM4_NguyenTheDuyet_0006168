@@ -1,11 +1,14 @@
 <?php
 require_once '../app/core/Controller.php';
 class sinhvien extends Controller{
-    public function index(){
+    public function index($limit = 5,$offset = 0,$search=""){
         $sinhvienModel = $this->model('sinhvienModel');
-        $sinhviens = $sinhvienModel->getAllSinhvien();
+        $sinhviens = $sinhvienModel->getAllSinhvien($limit,$offset,$search);
+        $results = $sinhvienModel->paging($limit, $offset, $search);
+        $sinhviens = $results['sinhviens'];
+        $totalPage = $results['totalPage'];
         //trả về view
-        $this->view("layout/masterlayout", ['viewname' => 'sinhvien/index', 'sinhviens' => $sinhviens, 'title' => 'Danh sách sinh viên']);
+        $this->view("layout/masterlayout", ['viewname' => 'sinhvien/index', 'sinhviens' => $sinhviens, 'title' => 'Danh sách sinh viên','total', 'totalPage' => $totalPage]);
     }
     public function create(){
         require_once '../app/views/sinhvien/create.php';
@@ -23,6 +26,8 @@ class sinhvien extends Controller{
             
             if($result){
                 echo "Thêm sinh viên thành công.";
+                 header("Location: /sinhvien/index"); 
+                exit();
             } else {
                 echo "Lỗi khi thêm sinh viên.";
             }
