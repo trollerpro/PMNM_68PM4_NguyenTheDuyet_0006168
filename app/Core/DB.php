@@ -3,7 +3,7 @@
         private $servername = "localhost";
         private $username = "root";
         private $password = "duyet2005";
-        private $dbname = "qlsv";
+        private $dbname = "68pm_34";
         public $conn;
         public function connect(){
             $self = new self();

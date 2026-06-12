@@ -16,12 +16,12 @@
     </style>
 </head>
 <body>
-    <div class="header"><?php require_once '../app/views/layout/partical/header.php';
+    <div class="header"><?php require_once __DIR__ . '/partical/header.php';
     ?></div>
     <div class="content">
         <?php
         // Determine view file path safely
-        $viewFile = __DIR__ . '/../' . (isset($viewname) ? $viewname : '') . '.php';
+        $viewFile = dirname(__DIR__) . '/' . (isset($viewname) ? $viewname : '') . '.php';
         if (!empty($viewname) && is_string($viewname) && file_exists($viewFile)) {
             require_once $viewFile;
         } else {
@@ -30,7 +30,7 @@
         }
         ?>
     </div>
-    <div class="footer"><?php require_once '../app/views/layout/partical/footer.php';
+    <div class="footer"><?php require_once __DIR__ . '/partical/footer.php';
     ?></div> 
     
 </body>

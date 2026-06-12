@@ -1,5 +1,5 @@
 <?php
-require_once '../app/core/DB.php';
+require_once __DIR__ . '/connectDB.php';
 class sinhvienModel {
     private $conn;
     public function __construct(){
@@ -12,34 +12,63 @@ class sinhvienModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function create(string $hoten, string $mssv, string $gioitinh){ 
-        $query = "INSERT INTO tbl_sinhviens (hoten, mssv, gioitinh) VALUES (:hoten, :mssv, :gioitinh)";
+    public function create(string $ten, string $mssv, string $gioitinh){ 
+        $id = $this->getNextId();
+        $query = "INSERT INTO tbl_sinhviens (id, ten, mssv, gioitinh) VALUES (:id, :ten, :mssv, :gioitinh)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':hoten', $hoten, PDO::PARAM_STR);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':ten', $ten, PDO::PARAM_STR);
         $stmt->bindParam(':mssv', $mssv, PDO::PARAM_STR);
         $stmt->bindParam(':gioitinh', $gioitinh, PDO::PARAM_STR);
-        if($stmt->execute()){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return $stmt->execute();
+    }
+    private function getNextId(){
+        $query = "SELECT MAX(id) AS max_id FROM tbl_sinhviens";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row && isset($row['max_id']) ? ((int)$row['max_id'] + 1) : 1;
     }
     public function paging($limit = 5,$offset = 0,$search = ""){
         $query = "SELECT * FROM tbl_sinhviens LIMIT :limit OFFSET :offset";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':limit',$limit,PDO::PARAM_INT);
-        $stmt->bindParam(':offset',$offset,PDO::PARAM_INT);
+        $stmt->bindValue(':limit',(int)$limit,PDO::PARAM_INT);
+        $stmt->bindValue(':offset',(int)$offset,PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // tính tổng số bàn ghi
+        // tính tổng số bản ghi
         $selectAllQuery = $this->conn->prepare("SELECT COUNT(*) FROM tbl_sinhviens");
         $selectAllQuery->execute();
-        $totalRecord = $selectAllQuery->fetchColumn();
-        $totalPage = ceil($totalRecord/$limit);
+        $totalRecord = (int)$selectAllQuery->fetchColumn();
+        $totalPage = ($limit > 0) ? ceil($totalRecord / $limit) : 0;
 
-        return ["sinviens"=>$result,"totalpage"=>$totalPage];
+        return ["sinhviens" => $result, "totalPage" => $totalPage];
+    }
+
+    public function getById(int $id){
+        $query = "SELECT * FROM tbl_sinhviens WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function update(int $id, string $ten, string $mssv, string $gioitinh){
+        $query = "UPDATE tbl_sinhviens SET ten = :ten, mssv = :mssv, gioitinh = :gioitinh WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':ten', $ten, PDO::PARAM_STR);
+        $stmt->bindParam(':mssv', $mssv, PDO::PARAM_STR);
+        $stmt->bindParam(':gioitinh', $gioitinh, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function delete(int $id){
+        $query = "DELETE FROM tbl_sinhviens WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 }
 ?>
