@@ -17,6 +17,19 @@
             <label for="gioitinh">Giới tính</label><br>
             <input type="text" name="gioitinh" id="gioitinh" required>
         </div>
+        <div class="form-group">
+            <label for="lop">Lớp</label><br>
+            <select name="lop" id="lop" required>
+                <option value="">-- Chọn lớp --</option>
+                <?php if (!empty($lops)): ?>
+                    <?php foreach ($lops as $lop): ?>
+                        <option value="<?php echo htmlspecialchars($lop['malop']); ?>"><?php echo htmlspecialchars($lop['tenlop']); ?></option>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <option value="">Không có lớp</option>
+                <?php endif; ?>
+            </select>
+        </div>
         <button type="submit">Thêm sinh viên</button>
     </form>
 </div>

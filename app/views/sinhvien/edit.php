@@ -18,6 +18,19 @@
             <label for="gioitinh">Giới tính</label><br>
             <input type="text" name="gioitinh" id="gioitinh" value="<?php echo htmlspecialchars($sinhvien['gioitinh']); ?>" required>
         </div>
+        <div class="form-group">
+            <label for="lop">Lớp</label><br>
+            <select name="lop" id="lop">
+                <option value="">-- Chọn lớp --</option>
+                <?php if (!empty($lops)): ?>
+                    <?php foreach ($lops as $lop): ?>
+                        <option value="<?php echo htmlspecialchars($lop['malop']); ?>" <?php echo (isset($sinhvien['lop']) && $sinhvien['lop'] == $lop['malop']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($lop['tenlop']); ?></option>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <option value="">Không có lớp</option>
+                <?php endif; ?>
+            </select>
+        </div>
         <button type="submit">Cập nhật sinh viên</button>
     </form>
     <?php else: ?>

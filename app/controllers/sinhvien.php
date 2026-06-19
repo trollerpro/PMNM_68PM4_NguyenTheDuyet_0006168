@@ -1,12 +1,16 @@
 <?php
 require_once __DIR__ . '/../Core/Controller.php';
 class sinhvien extends Controller{
+    private function getLops(){
+        $lopModel = $this->model('lopModel');
+        return $lopModel->getAll();
+    }
+
     public function index($limit = 5,$offset = 0,$search=""){
         $sinhvienModel = $this->model('sinhvienModel');
         $results = $sinhvienModel->paging($limit, $offset, $search);
         $sinhviens = $results['sinhviens'] ?? [];
         $totalPage = $results['totalPage'] ?? 0;
-        // trả về view
         $this->view("layout/masterlayout", [
             'viewname' => 'sinhvien/index',
             'sinhviens' => $sinhviens,
@@ -15,9 +19,11 @@ class sinhvien extends Controller{
         ]);
     }
     public function create(){
+        $lops = $this->getLops();
         $this->view("layout/masterlayout", [
             'viewname' => 'sinhvien/create',
-            'title' => 'Thêm sinh viên'
+            'title' => 'Thêm sinh viên',
+            'lops' => $lops
         ]);
     }
 
@@ -26,9 +32,10 @@ class sinhvien extends Controller{
             $ten = trim($_POST['ten'] ?? '');
             $mssv = trim($_POST['mssv'] ?? '');
             $gioitinh = trim($_POST['gioitinh'] ?? '');
+            $lop = trim($_POST['lop'] ?? '');
 
             $sinhvienModel = $this->model('sinhvienModel');
-            $result = $sinhvienModel->create($ten, $mssv, $gioitinh);
+            $result = $sinhvienModel->create($ten, $mssv, $gioitinh, $lop);
 
             if($result){
                 header("Location: /sinhvien/index");
@@ -49,10 +56,12 @@ class sinhvien extends Controller{
             return;
         }
 
+        $lops = $this->getLops();
         $this->view("layout/masterlayout", [
             'viewname' => 'sinhvien/edit',
             'title' => 'Sửa sinh viên',
-            'sinhvien' => $sinhvien
+            'sinhvien' => $sinhvien,
+            'lops' => $lops
         ]);
     }
 
@@ -62,9 +71,10 @@ class sinhvien extends Controller{
             $ten = trim($_POST['ten'] ?? '');
             $mssv = trim($_POST['mssv'] ?? '');
             $gioitinh = trim($_POST['gioitinh'] ?? '');
+            $lop = trim($_POST['lop'] ?? '');
 
             $sinhvienModel = $this->model('sinhvienModel');
-            $result = $sinhvienModel->update($id, $ten, $mssv, $gioitinh);
+            $result = $sinhvienModel->update($id, $ten, $mssv, $gioitinh, $lop);
 
             if($result){
                 header("Location: /sinhvien/index");

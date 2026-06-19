@@ -1,7 +1,10 @@
 <div class="content-container">
     <div class="header-area">
         <h1>Danh sách sinh viên</h1>
-        <a href="/sinhvien/create" class="btn-add">+ Thêm sinh viên</a>
+        <div>
+            <a href="/sinhvien/create" class="btn-add">+ Thêm sinh viên</a>
+            <a href="/lop/index" class="btn-add">Xem lớp</a>
+        </div>
     </div>
 
     <table>
@@ -11,6 +14,7 @@
                 <th>Tên</th>
                 <th>MSSV</th>
                 <th>Giới tính</th>
+                <th>Lớp</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
@@ -28,6 +32,7 @@
                 <td><?php echo htmlspecialchars($sinhvien['ten']); ?></td>
                 <td><?php echo htmlspecialchars($sinhvien['mssv']); ?></td>
                 <td><?php echo htmlspecialchars($sinhvien['gioitinh']); ?></td>
+                <td><?php echo htmlspecialchars($sinhvien['malop'] ?? ($sinhvien['lop'] ?? '')); ?></td>
                 <td class="action-links">
                     <a href="/sinhvien/edit/<?php echo $sinhvien['id']; ?>" class="btn-edit">Sửa</a>
                     <a href="/sinhvien/delete/<?php echo $sinhvien['id']; ?>" class="btn-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa sinh viên này không?')">Xóa</a>
@@ -38,7 +43,7 @@
             else: 
             ?>
             <tr>
-                <td colspan="5" style="text-align: center; padding: 20px;">Không có dữ liệu sinh viên.</td>
+                <td colspan="6" style="text-align: center; padding: 20px;">Không có dữ liệu sinh viên.</td>
             </tr>
             <?php endif; ?>
         </tbody>
