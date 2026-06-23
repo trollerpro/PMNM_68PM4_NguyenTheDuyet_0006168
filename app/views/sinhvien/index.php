@@ -7,6 +7,31 @@
         </div>
     </div>
 
+    <div class="search-area">
+        <form method="get" action="/sinhvien/index">
+            <input type="text" name="q" placeholder="Tìm theo tên hoặc MSSV" value="<?php echo htmlspecialchars($search ?? ''); ?>" />
+            <button type="submit">Tìm</button>
+        </form>
+    </div>
+
+    <?php
+    if (!isset($sinhviens)) {
+        $sinhviens = [];
+    }
+    if (!isset($limit)) {
+        $limit = 4;
+    }
+    if (!isset($currentPage)) {
+        $currentPage = 1;
+    }
+    if (!isset($totalPage)) {
+        $totalPage = 0;
+    }
+    if (!isset($totalRecord)) {
+        $totalRecord = 0;
+    }
+    ?>
+
     <table>
         <thead>
             <tr>
@@ -20,8 +45,9 @@
         </thead>
         <tbody>
             <?php 
-            $uri = explode('/', $_SERVER['REQUEST_URI']);
-            $current_offset = (isset($uri[4]) && is_numeric($uri[4])) ? (int)$uri[4] : 0;
+            $limit = isset($limit) ? (int)$limit : 4;
+            $currentPage = isset($currentPage) ? (int)$currentPage : 1;
+            $current_offset = ($currentPage - 1) * $limit;
             $stt = $current_offset + 1;
 
             if (!empty($sinhviens)):
@@ -51,11 +77,42 @@
 
     <div class="pagination">
         <?php
-            if (isset($totalPage) && $totalPage > 1) {
-                $pageSize = 5;
+            if (isset($totalPage) && $totalPage > 0) {
+                $pageSize = $limit;
+                $start = $current_offset + 1;
+                $end = $current_offset + (is_array($sinhviens) ? count($sinhviens) : 0);
+                if (isset($totalRecord)) {
+                    $end = min($end, $totalRecord);
+                }
+                echo "<div class='results-summary'>Hiển thị {$start} - {$end} / " . ($totalRecord ?? '0') . "</div>";
+
+                // Prev button (path-style)
+                if ($currentPage > 1) {
+                    $prevPage = $currentPage - 1;
+                    $prevPath = "/sinhvien/index/{$pageSize}/" . (($prevPage - 1) * $pageSize);
+                    if (!empty($search)) $prevPath .= '?q=' . urlencode($search);
+                    echo "<a href='" . $prevPath . "' class='prev'>« Prev</a> ";
+                } else {
+                    echo "<span class='disabled prev'>« Prev</span> ";
+                }
+
+                // Page numbers (path-style)
                 for ($i = 1; $i <= $totalPage; $i++) {
-                    $offset = ($i - 1) * $pageSize;
-                    echo "<a href='/sinhvien/index/$pageSize/$offset'>$i</a>";
+                    $offset_i = ($i - 1) * $pageSize;
+                    $path = "/sinhvien/index/{$pageSize}/{$offset_i}";
+                    if (!empty($search)) $path .= '?q=' . urlencode($search);
+                    $class = ($i == $currentPage) ? 'class="active"' : '';
+                    echo "<a href='" . $path . "' {$class}>$i</a> ";
+                }
+
+                // Next button (path-style)
+                if ($currentPage < $totalPage) {
+                    $nextPage = $currentPage + 1;
+                    $nextPath = "/sinhvien/index/{$pageSize}/" . (($nextPage - 1) * $pageSize);
+                    if (!empty($search)) $nextPath .= '?q=' . urlencode($search);
+                    echo "<a href='" . $nextPath . "' class='next'>Next »</a>";
+                } else {
+                    echo "<span class='disabled next'>Next »</span>";
                 }
             }
         ?>

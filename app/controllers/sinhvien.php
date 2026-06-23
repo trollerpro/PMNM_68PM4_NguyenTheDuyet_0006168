@@ -6,16 +6,34 @@ class sinhvien extends Controller{
         return $lopModel->getAll();
     }
 
-    public function index($limit = 5,$offset = 0,$search=""){
+    public function index($limit = 4,$offset = 0,$search=""){
+        // Read query params for search and pagination (GET: q, page, limit)
+        $q = trim($_GET['q'] ?? '');
+        $limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? (int)$_GET['limit'] : (int)$limit;
+        $page = isset($_GET['page']) && is_numeric($_GET['page']) ? max(1, (int)$_GET['page']) : null;
+
+        if ($page !== null) {
+            $offset = ($page - 1) * $limit;
+        } else {
+            $offset = is_numeric($offset) ? (int)$offset : 0;
+        }
+
         $sinhvienModel = $this->model('sinhvienModel');
-        $results = $sinhvienModel->paging($limit, $offset, $search);
+        $results = $sinhvienModel->paging($limit, $offset, $q);
         $sinhviens = $results['sinhviens'] ?? [];
         $totalPage = $results['totalPage'] ?? 0;
+        $totalRecord = $results['totalRecord'] ?? 0;
+        $currentPage = ($limit > 0) ? floor($offset / $limit) + 1 : 1;
+
         $this->view("layout/masterlayout", [
             'viewname' => 'sinhvien/index',
             'sinhviens' => $sinhviens,
             'title' => 'Danh sách sinh viên',
-            'totalPage' => $totalPage
+            'totalPage' => $totalPage,
+            'currentPage' => $currentPage,
+            'limit' => $limit,
+            'search' => $q,
+            'totalRecord' => $totalRecord
         ]);
     }
     public function create(){

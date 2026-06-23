@@ -43,20 +43,39 @@ class sinhvienModel {
         return $row && isset($row['max_id']) ? ((int)$row['max_id'] + 1) : 1;
     }
 
-    public function paging($limit = 5,$offset = 0,$search = ""){
-        $query = "SELECT s.*, l.malop AS malop, l.tenlop AS tenlop FROM tbl_sinhviens s LEFT JOIN tbl_lop l ON s.lop = l.malop LIMIT :limit OFFSET :offset";
-        $stmt = $this->conn->prepare($query);
+    public function paging($limit = 4,$offset = 0,$search = ""){
+        $baseQuery = "SELECT s.*, l.malop AS malop, l.tenlop AS tenlop FROM tbl_sinhviens s LEFT JOIN tbl_lop l ON s.lop = l.malop";
+        $params = [];
+        if (!empty($search)) {
+            $baseQuery .= " WHERE s.ten LIKE :search OR s.mssv LIKE :search";
+            $params[':search'] = "%{$search}%";
+        }
+        $baseQuery .= " LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->conn->prepare($baseQuery);
+        if (!empty($search)) {
+            $stmt->bindValue(':search', $params[':search'], PDO::PARAM_STR);
+        }
         $stmt->bindValue(':limit',(int)$limit,PDO::PARAM_INT);
         $stmt->bindValue(':offset',(int)$offset,PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $selectAllQuery = $this->conn->prepare("SELECT COUNT(*) FROM tbl_sinhviens");
-        $selectAllQuery->execute();
-        $totalRecord = (int)$selectAllQuery->fetchColumn();
+        // Count total records with same filter
+        $countQuery = "SELECT COUNT(*) FROM tbl_sinhviens s";
+        if (!empty($search)) {
+            $countQuery .= " WHERE s.ten LIKE :search OR s.mssv LIKE :search";
+            $countStmt = $this->conn->prepare($countQuery);
+            $countStmt->bindValue(':search', $params[':search'], PDO::PARAM_STR);
+            $countStmt->execute();
+        } else {
+            $countStmt = $this->conn->prepare($countQuery);
+            $countStmt->execute();
+        }
+        $totalRecord = (int)$countStmt->fetchColumn();
         $totalPage = ($limit > 0) ? ceil($totalRecord / $limit) : 0;
 
-        return ["sinhviens" => $result, "totalPage" => $totalPage];
+        return ["sinhviens" => $result, "totalPage" => $totalPage, "totalRecord" => $totalRecord];
     }
 
     public function getById(int $id){
